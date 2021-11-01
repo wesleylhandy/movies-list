@@ -1,7 +1,7 @@
 import { classNames } from '../utils/class-names';
 import React from 'react';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
-import { SliderNavigationDirection } from './slider-navigation-direction';
+import { SliderNavigationDirection } from '../utils/slider-navigation-direction';
 
 export interface SliderNavigationPadProps {
     ariaControls: string;

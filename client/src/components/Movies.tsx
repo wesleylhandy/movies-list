@@ -6,10 +6,10 @@ import {
   TmdbMovie,
   TmdbMovieGenre,
   TmdbMoviesPageResult,
-} from "./movie";
+} from "../utils/movie";
 import { MovieSlide } from "./MovieSlide";
 import { MovieSlider } from "./MovieSlider";
-import { SliderNavigationDirection } from "./slider-navigation-direction";
+import { SliderNavigationDirection } from "../utils/slider-navigation-direction";
 import { SortMovies } from "./SortMovies";
 import { Spinner } from "./Spinner";
 
@@ -30,7 +30,6 @@ export function Movies(): JSX.Element | null {
       fetch(`/api/movie/genres`).then((res) => res.json()),
     ])
       .then(([pageResult, { genres }]) => {
-        console.log(genres);
         const results = pageResult.results.map((movie: TmdbMovie) => {
           let movieGenres = [];
           if (movie.genre_ids) {

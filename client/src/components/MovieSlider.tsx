@@ -1,7 +1,7 @@
 import React, { ReactNode, useRef } from 'react';
-import { SliderNavigationDirection } from './slider-navigation-direction';
+import { SliderNavigationDirection } from '../utils/slider-navigation-direction';
 import { SliderNavigationPad } from './SliderNavigationPad';
-import { sliderScroll } from './slider-scroll';
+import { sliderScroll } from '../utils/slider-scroll';
 import { isPresent } from "../utils/value";
 
 export interface SliderProps {

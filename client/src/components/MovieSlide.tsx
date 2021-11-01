@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useModal } from "../hooks/useModal";
-import { TmdbMovie } from "./movie";
+import { TmdbMovie } from "../utils/movie";
 import { LazyImage } from "./LazyImage";
 import { isPresent } from "../utils/value";
 import { classNames } from "../utils/class-names";

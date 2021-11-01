@@ -1,4 +1,4 @@
-import { MovieListSort } from "./movie";
+import { MovieListSort } from "../utils/movie";
 import Select from "react-select";
 import { isPresent } from "../utils/value";
 

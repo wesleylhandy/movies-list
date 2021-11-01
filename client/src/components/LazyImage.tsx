@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { placeholder } from "./placeholder";
+import { placeholder } from "../utils/placeholder";
 
 interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   placeholderImg?: string;
