@@ -2,7 +2,7 @@ import React, { ReactNode, useRef } from 'react';
 import { SliderNavigationDirection } from '../utils/slider-navigation-direction';
 import { SliderNavigationPad } from './SliderNavigationPad';
 import { sliderScroll } from '../utils/slider-scroll';
-import { isPresent } from "../utils/value";
+import { isPresent } from "@perfective/common";
 
 export interface SliderProps {
     ariaLabel: string;
@@ -10,7 +10,6 @@ export interface SliderProps {
     canSlidePrev: boolean;
     canSlideNext: boolean;
     isLoading: boolean;
-    onFocus?: () => void;
     onSlide: (direction: SliderNavigationDirection, isAll?: boolean) => void;
     slideWidth: number;
     title?: string;
@@ -18,9 +17,8 @@ export interface SliderProps {
     testId?: string;
 }
 
-const carouselDefaultProps: Pick<SliderProps, 'children' | 'testId' | 'onFocus' | 'title'> = {
+const carouselDefaultProps: Pick<SliderProps, 'children' | 'testId' | 'title'> = {
     children: undefined,
-    onFocus: () => undefined,
     testId: 'slider-carousel',
     title: undefined,
 };
@@ -32,7 +30,6 @@ export function MovieSlider(props: SliderProps): JSX.Element | null {
         canSlideNext,
         carouselId,
         isLoading,
-        onFocus,
         onSlide,
         slideWidth,
         children,
@@ -104,16 +101,12 @@ export function MovieSlider(props: SliderProps): JSX.Element | null {
         }
     }
 
-    function handleFocus(_event: React.FocusEvent<HTMLDivElement>) {
-        if (isPresent(onFocus)) onFocus();
-    }
-
     if (typeof children === 'undefined') {
         return null;
     }
 
     return (
-        <section className="bg-transparent my-8 flex-grow" data-testid={testId}>
+        <section className="bg-transparent my-8 flex-grow flex-shrink-0" data-testid={testId}>
             {title && <h3 className="text-center uppercase mb-5 text-3xl">{title}</h3>}
             <div className="carousel relative flex flex-row items-center h-full">
                 <SliderNavigationPad
@@ -136,7 +129,6 @@ export function MovieSlider(props: SliderProps): JSX.Element | null {
                         aria-roledescription="carousel"
                         aria-label={ariaLabel}
                         tabIndex={0}
-                        onFocus={handleFocus}
                         onKeyDown={handleKeyDown}
                     >
                         {children}

@@ -1,12 +1,14 @@
-import React, { ReactNode, Dispatch, useContext, useState } from "react";
+import * as React from "react";
+import { DispatchAssign, useAssignReducer } from "./useAssignReducer";
 
-export interface ModalCreatedContext {
+export interface ModalInnerState {
   isModalClosed: boolean;
-  setIsModalClosed: Dispatch<boolean>;
   title: string;
-  setTitle: Dispatch<string>;
-  modalContent?: ReactNode;
-  setModalContent: Dispatch<ReactNode | undefined>;
+  modalContent?: React.ReactNode;
+}
+
+export interface ModalCreatedContext extends ModalInnerState {
+  modalDispatch: DispatchAssign<ModalInnerState>
 }
 
 const ModalContext = React.createContext<ModalCreatedContext | undefined>(
@@ -14,23 +16,25 @@ const ModalContext = React.createContext<ModalCreatedContext | undefined>(
 );
 
 export interface ModalProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
+}
+
+function initialModalState(): ModalInnerState {
+  return {
+    isModalClosed: true,
+    title: "Modal",
+    modalContent: undefined,
+  }
 }
 
 export function ModalProvider({ children }: ModalProviderProps): JSX.Element {
-  const [isModalClosed, setIsModalClosed] = useState<boolean>(true);
-  const [title, setTitle] = useState<string>("Modal");
-  const [modalContent, setModalContent] = useState<ReactNode | undefined>();
+  const [innerModalState, modalDispatch] = useAssignReducer(initialModalState());
 
   return (
     <ModalContext.Provider
       value={{
-        isModalClosed,
-        setIsModalClosed,
-        setTitle,
-        title,
-        modalContent,
-        setModalContent,
+        ...innerModalState,
+        modalDispatch,
       }}
     >
       {children}
@@ -40,19 +44,19 @@ export function ModalProvider({ children }: ModalProviderProps): JSX.Element {
 
 export function useModal(
   title?: string,
-  isClosed?: boolean
+  isModalClosed?: boolean
 ): ModalCreatedContext {
-  const context = useContext(ModalContext);
+  const context = React.useContext(ModalContext);
   if (typeof context === "undefined") {
     throw new Error("useModal must be used within a ModalProvider");
   }
 
   if (typeof title !== "undefined" && title !== context.title) {
-    context.setTitle(title);
+    context.modalDispatch({ title });
   }
 
-  if (typeof isClosed !== "undefined" && isClosed !== context.isModalClosed) {
-    context.setIsModalClosed(isClosed);
+  if (typeof isModalClosed !== "undefined" && isModalClosed !== context.isModalClosed) {
+    context.modalDispatch({ isModalClosed });
   }
 
   return context;

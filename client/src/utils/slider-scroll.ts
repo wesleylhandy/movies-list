@@ -1,4 +1,4 @@
-import { isPresent } from '../utils/value';
+import { isPresent } from '@perfective/common';
 import { SliderNavigationDirection } from './slider-navigation-direction';
 
 interface ScrollArguments {

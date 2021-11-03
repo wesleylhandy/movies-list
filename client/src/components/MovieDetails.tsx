@@ -1,9 +1,9 @@
-import { isPresent } from "../utils/value";
+import { isPresent } from "@perfective/common";
+import { TmdbMovie } from "../utils/movie";
 import { LazyImage } from "./LazyImage";
-import { MovieProps } from "./MovieSlide";
 
 export function MovieDetails(
-  props: Omit<MovieProps, "onMouseEnter" | "index">
+  props: { movie: TmdbMovie }
 ): JSX.Element {
   const { movie } = props;
   return (

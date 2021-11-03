@@ -2,7 +2,7 @@ import { MdClear } from "react-icons/md";
 import { motion } from "framer-motion";
 import { useModal } from "../hooks/useModal";
 import useOnClickOutside from "use-onclickoutside";
-import { useRef } from "react";
+import * as React from "react";
 import { Portal } from "./Portal";
 
 export interface ModalProps {
@@ -15,12 +15,23 @@ const defaultProductModalProps: Pick<ModalProps, "testId"> = {
 
 export function MovieModal(props: ModalProps): JSX.Element | null {
   const { testId } = props;
-  const ref = useRef(null);
-  const { title, isModalClosed, setIsModalClosed, modalContent } = useModal();
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  const closeModalRef = React.useRef<HTMLButtonElement>(null);
+  const { title, isModalClosed, modalDispatch, modalContent } = useModal();
 
-  useOnClickOutside(ref, () => {
-    setIsModalClosed(true);
+  useOnClickOutside(modalRef, () => {
+    modalDispatch({ isModalClosed: true });
   });
+
+  React.useEffect(() => {
+    if (
+      closeModalRef.current !== null
+      && closeModalRef.current !== document.activeElement
+      && !isModalClosed
+    ) {
+      closeModalRef.current.focus();
+    }
+  }, [isModalClosed]);
 
   if (isModalClosed || !modalContent) {
     return null;
@@ -28,7 +39,7 @@ export function MovieModal(props: ModalProps): JSX.Element | null {
 
   function handleCloseClick(event: React.MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
-    setIsModalClosed(true);
+    modalDispatch({ isModalClosed: true });
   }
   return (
     <Portal>
@@ -48,7 +59,7 @@ export function MovieModal(props: ModalProps): JSX.Element | null {
           stiffness: 75,
           duration: 0.3,
         }}
-        className="fixed left-0 top-0 z-10 bg-translucent w-screen h-screen m-0 sm:my-5 p-o sm:py-5"
+        className="fixed left-0 top-0 z-10 bg-translucent w-screen h-screen m-0 sm:my-5 p-0 sm:py-5 overflow-scroll"
         data-testid={testId}
         role="dialog"
         aria-labelledby="modal-title"
@@ -76,20 +87,21 @@ export function MovieModal(props: ModalProps): JSX.Element | null {
           }}
           className="bg-light w-full max-w-screen-lg m-auto h-auto"
         >
-          <div ref={ref} className="w-full bg-gray-100 m-0 p-6 flex">
+          <div ref={modalRef} className="w-full bg-gray-100 m-0 p-6 flex">
             <h2 id="modal-title">{title}</h2>
             <button
+              ref={closeModalRef}
               className="ml-auto bg-transparent text-2xl"
               type="button"
               onClick={handleCloseClick}
               title="Close Modal"
               aria-label="Close Modal"
-              autoFocus
+              autoFocus={!isModalClosed}
             >
               <MdClear />
             </button>
           </div>
-          <div className="w-full m-0 p-6 bg-gray-100">{modalContent}</div>
+          <div className="w-full m-0 p-6 pb-10 bg-gray-100">{modalContent}</div>
         </motion.div>
       </motion.div>
     </Portal>

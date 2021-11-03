@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define -- Hoisted function declarations */
-import { isAbsent, isPresent } from './value';
+import { isAbsent, isPresent } from '@perfective/common';
 
 export type Classes = string | (string | null | undefined)[] | null | undefined;
 

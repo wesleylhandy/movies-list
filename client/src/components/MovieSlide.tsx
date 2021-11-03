@@ -1,42 +1,40 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 import { useModal } from "../hooks/useModal";
 import { TmdbMovie } from "../utils/movie";
 import { LazyImage } from "./LazyImage";
-import { isPresent } from "../utils/value";
+import { isAbsent, isPresent } from "@perfective/common"
 import { classNames } from "../utils/class-names";
 import { MovieDetails } from "./MovieDetails";
+import { useQueryClient } from 'react-query';
 
 export interface MovieProps {
-    movie: TmdbMovie;
+    movieId: TmdbMovie["id"];
     index: number;
     isActive: boolean;
+    isFetching: boolean;
     onMouseEnter: (index: number) => void;
 }
 
-export function MovieSlide(props: MovieProps): JSX.Element {
-    const { movie, index, isActive, onMouseEnter } = props;
-    const [movieDetails, setMovieDetails] = useState<TmdbMovie>(movie);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { setModalContent, setTitle, setIsModalClosed } = useModal();
-    useEffect(() => {
-        if (isPresent(movieDetails.id)) {
-            setIsLoading(true);
-            fetch(`/api/movie/${movieDetails.id?.toString()}`)
-                .then(res => res.json())
-                .then(json => setMovieDetails(prevMovieDetails => ({ ...prevMovieDetails, ...json.movie })))
-                .catch(console.error)
-                .finally(() => setIsLoading(false))
-        }
-    }, [movieDetails.id]);
+export function MovieSlide(props: MovieProps): JSX.Element | null {
+    const { movieId, index, isActive, onMouseEnter, isFetching } = props;
+    const { modalDispatch } = useModal();
+    const queryClient = useQueryClient();
+    const queryData= queryClient.getQueryData<{ movie: TmdbMovie; }>(['movie', movieId]);
 
-    function handleClick(event: React.MouseEvent<HTMLImageElement>): void {
-        event.preventDefault();
-        if (isLoading) {
-            return;
+    if (isAbsent(queryData) || isAbsent(queryData.movie)) {
+        return null;
+    }
+
+    const { movie } = queryData;
+
+    function handleClick(_event: React.MouseEvent<HTMLImageElement>): void {
+        if (isPresent(movie)) {
+            modalDispatch({
+                title: movie?.title,
+                modalContent: <MovieDetails movie={movie} />,
+                isModalClosed: false,
+            })
         }
-        setTitle(movieDetails.title as string);
-        setModalContent(<MovieDetails movie={movieDetails} isActive={isActive} />);
-        setIsModalClosed(false);
     }
 
     function handleMouseEnter() {
@@ -48,20 +46,21 @@ export function MovieSlide(props: MovieProps): JSX.Element {
     return (
         <div className={classNames("w-full max-w-xs hover:max-w-sm flex flex-col justify-center mx-5 flex-shrink-0", { 'max-w-sm': isActive })}>
             <LazyImage 
-                className={classNames("flex w-full cursor-pointer hover:shadow-2xl", { 'cursor-not-allowed': isLoading, 'shadow-2xl': isActive })}
-                src={movieDetails.poster_path as string}
-                alt={movieDetails.title}
+                className={classNames("flex w-full cursor-pointer hover:shadow-2xl", { 'cursor-not-allowed': isFetching, 'shadow-2xl': isActive })}
+                src={movie.poster_path as string}
+                alt={movie.title}
                 onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
-                tabIndex={isLoading ? -1 : 0}
+                tabIndex={isFetching ? -1 : 0}
             />
-            <div className="text-center text-lg font-sans text-gray-50 my-5">{movieDetails.title}</div>
-            {isPresent(movieDetails.genres) && (
-                <div className="text-center text-base font-body text-gray-200 my-3">{movieDetails.genres.map(genre => genre.name).join(', ')}</div>
+            <div className="text-center text-lg font-sans text-gray-50 my-5">{movie.title}</div>
+            {isPresent(movie.genres) && (
+                <div className="text-center text-base font-body text-gray-200 my-3">{movie.genres.map(genre => genre.name).join(', ')}</div>
             )}
-            {isPresent(movieDetails.release_date) && (
-                <div className="text-center text-base font-body text-gray-200 my-3">{movieDetails.release_date.slice(0,4)}</div>
+            {isPresent(movie.release_date) && (
+                <div className="text-center text-base font-body text-gray-200 my-3">{movie.release_date.slice(0,4)}</div>
             )}
         </div> 
-    )
+    );
 }
+

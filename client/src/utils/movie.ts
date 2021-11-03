@@ -1,4 +1,7 @@
-export const MOVIE_TILE_WIDTH = 500;
+import { isPresent } from "@perfective/common";
+import { InfiniteData } from 'react-query'
+
+export const MOVIE_TILE_WIDTH = 360;
 
 export type DateString = string;
 export type Int32 = number;
@@ -70,15 +73,6 @@ export interface TmdbMoviesPageResult {
     total_results: Int32;
 }
 
-export enum MovieListSort {
-    NameAscending = "Name Ascending",
-    NameDescending = "Name Descending",
-    GenreAscending = "Genre Ascending",
-    GenreDescending = "Genre Descending",
-    YearAscending = "Year Ascending",
-    YearDescending = "Year Descending",
-}
-
 export function emptyTmdbMoviesPageResult(): TmdbMoviesPageResult {
     return {
         dates: {
@@ -90,4 +84,36 @@ export function emptyTmdbMoviesPageResult(): TmdbMoviesPageResult {
         total_pages: 0,
         total_results: 0,
     }
+}
+
+export function defaultTmdbMoviesPageResult(result: Partial<TmdbMoviesPageResult> = {}): TmdbMoviesPageResult {
+    return {
+        ...emptyTmdbMoviesPageResult(),
+        ...result,
+    }
+}
+
+export function resultsFromFetch(nowPlaying: InfiniteData<TmdbMoviesPageResult> | undefined, genres: {
+    genres: TmdbMovieGenre[];
+} | undefined): TmdbMovie[] {
+    return nowPlaying?.pages.reduce((results, page) => ({...results, ...page})).results.map((movie: TmdbMovie) => {
+      let movieGenres: TmdbMovieGenre[] = [];
+      if (isPresent(movie.genre_ids)) {
+        movieGenres = movie.genre_ids
+          .map((id) => {
+            return genres?.genres?.find((genre: TmdbMovieGenre) => id === genre.id);
+          })
+          .filter(isPresent);
+      }
+      return { ...movie, genres: movieGenres };
+    }) ?? [];
+}
+  
+export function uniqueResults(results: TmdbMovie[]): TmdbMovie[] {
+    return results.reduce<TmdbMovie[]>((uniqueResults, result) => {
+        if (uniqueResults.find(el => el.id === result.id)) {
+            return uniqueResults;
+        }
+        return [...uniqueResults, result];
+    }, [])
 }

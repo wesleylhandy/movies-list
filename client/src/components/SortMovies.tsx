@@ -1,29 +1,12 @@
-import { MovieListSort } from "../utils/movie";
+import { MovieListSort, Option, sortOptions } from "../utils/movie-sort";
 import Select from "react-select";
-import { isPresent } from "../utils/value";
+import { isPresent } from "@perfective/common";
 
 export interface SortMovieProps {
   isDisabled: boolean;
   onSort: (term: MovieListSort) => void;
   selectedSort: MovieListSort;
 }
-
-type Option = {
-  value: MovieListSort;
-  label: MovieListSort;
-};
-
-const options: Option[] = [
-  { value: MovieListSort.NameAscending, label: MovieListSort.NameAscending },
-  { value: MovieListSort.NameDescending, label: MovieListSort.NameDescending },
-  { value: MovieListSort.GenreAscending, label: MovieListSort.GenreAscending },
-  {
-    value: MovieListSort.GenreDescending,
-    label: MovieListSort.GenreDescending,
-  },
-  { value: MovieListSort.YearAscending, label: MovieListSort.YearAscending },
-  { value: MovieListSort.YearDescending, label: MovieListSort.YearDescending },
-];
 
 export function SortMovies(props: SortMovieProps): JSX.Element {
   const { isDisabled, onSort, selectedSort } = props;
@@ -34,11 +17,11 @@ export function SortMovies(props: SortMovieProps): JSX.Element {
   }
 
   return (
-      <div className="fixed w-60">
+      <div className="fixed w-60 top-5">
           <label className="flex items-center"><span className="text-gray-100 mr-5">Sort</span>
             <Select
                 className="flex-grow"
-                options={options}
+                options={sortOptions}
                 isDisabled={isDisabled}
                 onChange={handleChange}
                 defaultValue={{ value: selectedSort, label: selectedSort }}
