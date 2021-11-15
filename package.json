@@ -2,14 +2,14 @@
   "name": "movie-service",
   "version": "1.0.0",
   "description": "Movie Service Project",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
     "prestart": "yarn build",
     "start": "concurrently \"yarn server\" \"yarn client\"",
     "client": "node start-client",
-    "server": "node dist/index",
+    "server": "node build/index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Wesley L. Handy <wesleylhandy@gmail.com>",
